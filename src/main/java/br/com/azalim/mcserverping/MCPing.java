@@ -44,6 +44,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MCPing {
 
@@ -153,6 +157,16 @@ public class MCPing {
 
         }
 
+        MCQuery query;
+
+        try {
+            query = new MCQuery(hostname, port, 0);
+            query.sendQueryRequest();
+        } catch (IOException e) {
+            //do nothing
+            query = null;
+        }
+
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         JsonElement descriptionJsonElement = jsonObject.get("description");
 
@@ -179,6 +193,61 @@ public class MCPing {
         }
 
         MCPingResponse output = GSON.fromJson(jsonObject, MCPingResponse.class);
+
+//        System.out.println(query.isSuccess());
+
+        if (output.getModinfo() != null && output.getModinfo().getD() != null) {
+            output.setModinfo(output.getModinfo().getD());
+        }
+
+        try {
+            if (query != null && query.isSuccess()) {
+                if (output.getPlayers().getSample() == null || query.getOnlineUsernames().length > output.getPlayers().getSample().size()) {
+                    List<String> playerNames = new ArrayList<>();
+                    List<MCPingResponse.Player> sample = output.getPlayers().getSample();
+
+                    if (sample != null) {
+                        playerNames = sample.stream().map((MCPingResponse.Player::getName)).collect(Collectors.toList());
+                    } else {
+                        sample = new ArrayList<>();
+                    }
+
+                    for (String player : query.getOnlineUsernames()) {
+                        if (!playerNames.contains(player)) {
+                            sample.add(new MCPingResponse.Player(player, null));
+                            playerNames.add(player);
+                        }
+                    }
+
+                    output.getPlayers().setSample(sample);
+                }
+
+                String pluginValue = query.getValues().get("plugins");
+
+                if (pluginValue.length() > 0) {
+                    String[] split = pluginValue.split(": ");
+                    String software = split[0];
+                    String pluginCSV = split[1];
+                    String[] pluginList = pluginCSV.split("; ");
+
+                    List<MCPingResponse.Plugin> plugins = new ArrayList<>();
+                    for (String pluginString : pluginList) {
+                        String[] spl = pluginString.split(" ");
+                        String pluginName = spl[0];
+                        String pluginVersion = spl[1];
+
+                        plugins.add(new MCPingResponse.Plugin(pluginName, pluginVersion));
+                    }
+
+                    output.setSoftware(software);
+                    output.setPluginlist(plugins);
+                }
+
+            }
+        } catch (RuntimeException e) {
+            // TODO: Fix runtime error :)
+        }
+
         output.setPing(ping);
 
         return output;

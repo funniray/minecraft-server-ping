@@ -7,6 +7,8 @@ import br.com.azalim.mcserverping.MCPingResponse.Description;
 import br.com.azalim.mcserverping.MCPingResponse.Player;
 import br.com.azalim.mcserverping.MCPingResponse.Players;
 import br.com.azalim.mcserverping.MCPingResponse.Version;
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +18,8 @@ public class MCPingExample {
     public static void main(String[] args) {
 
         MCPingOptions options = MCPingOptions.builder()
-                .hostname("redesky.com")
+                .hostname("dad.funniray.com")
+                .port(25504)
                 .build();
 
         MCPingResponse reply;
@@ -66,6 +69,8 @@ public class MCPingExample {
         System.out.println();
 
         System.out.println(String.format("Favicon: %s", reply.getFavicon()));
+
+        System.out.println(new Gson().toJson(reply));
 
     }
 

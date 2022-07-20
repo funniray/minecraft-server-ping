@@ -28,7 +28,14 @@
  */
 package br.com.azalim.mcserverping;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import br.com.azalim.mcserverping.serializers.ForgeDataSerializer;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -67,6 +74,53 @@ public class MCPingResponse {
     @Setter
     private long ping;
 
+    @Setter
+    private String software;
+
+    @Setter
+    private List<Plugin> pluginlist;
+
+    @SerializedName(value="modinfo", alternate = "forgeData")
+    @Setter
+    private ModInfo modinfo;
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class ModInfo {
+        private String type;
+
+        private int fmlNetworkVersion;
+
+        private Set<Channel> channels;
+
+        @SerializedName(value = "modList", alternate = "mods")
+        private Set<Mod> modList;
+
+        private boolean truncated;
+
+        @JsonAdapter(ForgeDataSerializer.class)
+        private ModInfo d;
+    }
+
+    @Getter @ToString @AllArgsConstructor
+    public static class Channel {
+        private String res;
+        private String version;
+        private boolean required;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class Mod {
+        @SerializedName(value = "modid", alternate = "modId")
+        private String modid;
+
+        @SerializedName(value = "version", alternate = "modmarker")
+        private String version;
+    }
+
     @Getter
     @ToString
     public class Description {
@@ -99,13 +153,14 @@ public class MCPingResponse {
         /**
          * @return List of some players (if any) specified by server
          */
+        @Setter
         private List<Player> sample;
-
     }
 
     @Getter
     @ToString
-    public class Player {
+    @AllArgsConstructor
+    public static class Player {
 
         /**
          * @return Name of player
@@ -113,9 +168,19 @@ public class MCPingResponse {
         private String name;
 
         /**
-         * @return Unknown
+         * @return Player's UUID
          */
         private String id;
+
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class Plugin {
+
+        private String name;
+        private String version;
 
     }
 

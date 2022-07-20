@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.com.azalim</groupId>
     <artifactId>mcserverping</artifactId>
-    <version>1.0.5</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>MCServerPing</name>
@@ -52,6 +52,18 @@
             <artifactId>bungeecord-chat</artifactId>
             <version>1.16-R0.4</version>
             <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.77.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.77.Final</version>
         </dependency>
 
     </dependencies>
